@@ -1,0 +1,347 @@
+---
+modules:
+    - docassemble.base.util
+    - docassemble.base.legal
+    - docassemble.income.income
+    - dateutil
+    - .educational_evaluations
+---
+include:
+  - massachusetts_educational_evaluations_basic_information.yml
+---
+features:
+  bootstrap theme: mac-bootstrap.css
+---
+metadata:
+    title: | 
+        MAC Request for Initial Special Education Evaluation
+    description: |
+        An interview to request an independent evaluation from a school.
+    authors:
+        - name: Matt Brooks
+          organization: Lemma Legal
+    revision_date: 2019-12-20
+---
+id: interview order initial request
+mandatory: True
+code: |
+  educational_evaluations_intro_screen
+  student.evaluations_list = list()
+  if known_evaluations.any_true():
+    for key in known_evaluations:
+      if known_evaluations[key] == True:
+        student.evaluations_list.append(key)
+  # else:
+  #   educational_assessment = True
+  #   if speech_and_language_therapy.any_true():
+  #     student.evaluations_list.append('Speech and Language Therapy Evaluation')
+  #   else:
+  #     pass
+  #   if social_pragmatic_language.any_true():
+  #     student.evaluations_list.append('Social Pragmatic Language')
+  #   student.evaluations_list.append('Educational Assessment')
+  #   if occupational_therapy.any_true():
+  #     student.evaluations_list.append('Occupational Therapy')
+  #   else:
+  #     pass
+  #   if functional_behavior_assessment.any_true():
+  #     student.evaluations_list.append('Functional Behavior Assessment')
+  #   else:
+  #     pass
+  #   if psychological_assessment.any_true():
+  #     student.evaluations_list.append('Psychological Assessment')
+  #   else:
+  #     pass
+  #   if physical_therapy.any_true():
+  #     student.evaluations_list.append('Physical Therapy')
+  #   else:
+  #     pass
+  #   if augmentative_and_alternative_communication.any_true():
+  #     student.evaluations_list.append('Augmentative and Alternative Communication Evaluation')
+  #   else:
+  #     pass
+  #   if assistive_technology.any_true():
+  #     student.evaluations_list.append('Assistive Technology Evaluation')
+  #   else:
+  #     pass
+  initial_request_concatenated = pdf_concatenate(initial_request_variable)
+  done
+  end_screen
+---
+id: confirm evaluations screen
+question : |
+  These are the evaluations you selected
+fields:
+  - "These are the evaluations you selected. You can change them now if you want to.": selected_evaluations
+    datatype: checkboxes
+    choices:
+      - Educational Assessment
+      - Speech and Language Therapy Evaluation
+      - Social Pragmatic Language
+      - Occupational Therapy
+      - Functional Behavior Assessment
+      - Psychological Assessment
+      - Physical Therapy
+      - Augmentative and Alternative Communication Evaluation
+      - Assistive Technology Evaluation
+    default:
+      code: |
+        student.evaluations_list
+
+---
+id: skip to end screen
+question: |
+  Please select the evaluations you want.
+fields:
+  - "Select the evaluations you want": known_evaluations
+    datatype: checkboxes
+    choices:
+      - Educational Assessment
+      - Speech and Language Therapy Evaluation
+      - Social Pragmatic Language
+      - Occupational Therapy
+      - Functional Behavior Assessment
+      - Psychological Assessment
+      - Physical Therapy
+      - Augmentative and Alternative Communication Evaluation
+      - Assistive Technology Evaluation
+---
+id: initial evaluation intro screen
+question: |
+  The following checklists are to help you decide what evaluations you think ${student.name.first} needs.
+  
+under: |  
+  When you see your letter at the end, you can add or remove evaluations from the letter.  
+  
+  It is a good idea to talk to ${student.name.first}'s pediatrician or specialists about other evaluations ${student.pronoun()} might need if you are unsure.
+field: educational_evaluations_intro_screen
+---
+id: speech and language therapy
+question: |
+  % if requestor.right_to_send == 'Student':
+  Check any of the following that you think are true about yourself.
+  % else:
+  Check any of the following that are true about ${student.name.first}.
+  % endif
+fields:
+  - "": speech_and_language_therapy
+    datatype: checkboxes
+    choices:
+      - ${ student.name.first } has problems talking.
+
+      - ${ student.name.first } has trouble following directions.
+
+      - People that don't know ${student.name.first} can't understand ${student.pronoun()}.
+     
+      - ${ student.name.first } can't be understood by people not familiar with ${ student.pronoun() }.
+               
+      - ${ student.name.first } does not speak or has limited speech (also known as non-verbal).
+     
+      - ${ student.name.first } has problems finding words to communicate. 
+    none of the above: |
+      I don't know.              
+---
+id: social pragmatic language
+question: |
+  % if requestor.right_to_send == 'Student':
+  Check any of the following that you think are true about yourself.
+  % else:
+  Check any of the following that are true about ${student.name.first}.
+  % endif
+fields:
+  - "": social_pragmatic_language
+    datatype: checkboxes
+    choices:
+      - ${ student.name.first } does not understand back and forth conversation.
+
+      - ${ student.name.first } does not know when others are not or no longer interested in what ${student.pronoun_subjective()} is saying.
+
+      - ${ student.name.first } does not know how to greet people.
+
+      - ${ student.name.first } does not know how to respond to the {social cues} of others.
+    none of the above: |
+      I don't know.
+terms:
+  social cues: |
+    Social cues are signals that people send through body language or facial expressions. When a child misses social cues they can misunderstand people and situations.
+comment: |
+  Why isn't social cues showing up as a term in the interview?
+---
+id: occupational therapy
+question: |
+  % if requestor.right_to_send == 'Student':
+  Check any of the following that you think are true about yourself.
+  % else:
+  Check any of the following that are true about ${student.name.first}.
+  % endif
+fields:
+  - "": occupational_therapy
+    datatype: checkboxes
+    choices:   
+      - ${ student.name.first } cannot independently do activities of daily living (brushing teeth, dressing, do buttons and zippers, use eating utensils, feed self, toilet).
+     
+      - It is hard for ${student.name.first } to write or use a pen or pencil.
+
+      - ${ student.name.first } is sensitive to loud sounds and/or certain textures.
+     
+      - ${ student.name.first } will sometimes bang on things or bump into things more than other children ${student.pronoun_possessive("age")}.
+    none of the above: |
+      I don't know.
+---
+id: functional behavior assessment
+question: |
+  % if requestor.right_to_send == 'Student':
+  Check any of the following that you think are true about yourself.
+  % else:
+  Check any of the following that are true about ${student.name.first}.
+  % endif
+fields:
+  - "": functional_behavior_assessment
+    datatype: checkboxes
+    choices:
+      - I am concerned about ${student.name.first}'s behavior at home or at school.
+  
+      - ${ student.name.first } has behaviors that keep ${student.pronoun()} from learning.
+     
+      - ${student.name.first} has behaviors that make it hard for ${student.pronoun()} to make friends in school. 
+
+      - ${ student.name.first } has tantrums more easily or more often than other children ${student.pronoun_possessive('age')}.
+     
+      - ${ student.name.first } does not know how to communicate ${student.pronoun_possessive("wants/need")} with others.
+               
+      - I have received calls from the school about ${ student.name.first }'s behavior.
+     
+      - ${ student.name.first } has been sent home from school due to behaviors.
+     
+      - I have been told that ${ student.name.first } needed to be restrained or removed from the class due to ${ student.pronoun_possessive("behavior") }.
+     
+      - ${ student.name.first } often refuses to go to school.
+    none of the above: |
+      I don't know.
+
+---
+id: psychological assessment
+question: |
+  % if requestor.right_to_send == 'Student':
+  Check any of the following that you think are true about yourself.
+  % else:
+  Check any of the following that are true about ${student.name.first}.
+  % endif
+fields:
+  - "": psychological_assessment
+    datatype: checkboxes
+    choices:
+      - ${student.name.first} has a mental health disability.
+
+      - I have concerns about ${ student.pronoun_possessive("emotional wellbeing") } or moods.
+    
+      - ${ student.name.first } cannot tell others what ${ student.pronoun_subjective() } wants or needs.
+    
+      - ${ student.name.first } sees a mental health counselor at and/or in the community.
+    
+      - ${ student.name.first } has had traumatic experiences
+    none of the above: |
+      I don't know.
+
+---
+id: physical therapy
+question: |
+  % if requestor.right_to_send == 'Student':
+  Check any of the following that you think are true about yourself.
+  % else:
+  Check any of the following that are true about ${student.name.first}.
+  % endif
+fields:
+  - "": physical_therapy
+    datatype: checkboxes
+    choices:
+      - ${ student.name.first } has a physical disability.
+    
+      - ${ student.name.first } has trouble with coordination.
+    none of the above: |
+      I don't know.
+
+---
+id: augmentative and alternative communication
+question: |
+  % if requestor.right_to_send == 'Student':
+  Check any of the following that you think are true about yourself.
+  % else:
+  Check any of the following that are true about ${student.name.first}.
+  % endif
+fields:
+  - "": augmentative_and_alternative_communication
+    datatype: checkboxes
+    choices:
+      - ${ student.name.first } is nonverbal or has limited speech.
+    
+      - ${ student.name.first } cannot make ${ student.pronoun_possessive("wants") } and needs known.
+    none of the above: |
+      I don't know.
+
+---
+id: assistive technology
+question: |
+  % if requestor.right_to_send == 'Student':
+  Check any of the following that you think are true about yourself.
+  % else:
+  Check any of the following that are true about ${student.name.first}.
+  % endif
+fields:
+  - "": assistive_technology
+    datatype: checkboxes
+    choices: 
+      - ${ student.name.first } has trouble organizing ${ student.pronoun_possessive("thoughts") } or ideas for school projects and homework.
+    
+      - ${ student.name.first } has difficulty initiating tasks.
+    
+      - ${ student.name.first } has a hard time focusing or staying on track.
+    
+      - ${ student.name.first } has a learning disability.
+    
+      - ${ student.name.first } has trouble reading and/or writing.
+    
+      - ${ student.name.first } cannot make ${ student.pronoun_possessive("feelings") } known.
+    none of the above: |
+      I don't know.
+
+---
+id: signature block
+question: |
+  ${ requestor.name.firstlast() }
+signature: requestor.signature
+under: |
+  Sign your name here by using your mouse or touching your phone's screen.
+  Press clear if you want to start over.
+---
+id: letter screen
+question: |
+  Here is your letter
+
+  ${ initial_request_concatenated }
+
+under: |
+  % if is_child_in_school == False and school.special_education_director.address == None:
+  Because your child is not in school, you need to send it to the special education director for your district.
+  Please contact  MAC’s helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
+  for help locating this address. It may take up to three business days for someone to get back to you.
+
+  You may also be able to find the name of your district's special education director  by searching [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx).
+
+  % endif
+field: done
+---
+id: end screen initial request
+event: end_screen
+question: |
+  You are all done!
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+id: attachment block
+attachment:
+  - name: initial_request_name
+    variable name: initial_request_variable
+    filename: initial_request
+    docx template file: initial_request_template.docx
