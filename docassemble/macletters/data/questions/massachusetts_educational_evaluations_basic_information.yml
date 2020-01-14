@@ -13,7 +13,7 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
-    revision_date: 2019-12-18
+    revision_date: 2020-01-14
 ---
 objects:
     - requestor: Individual
@@ -33,7 +33,7 @@ comment: |
 	## Mandatory block that determines interview order.
 mandatory: True
 code: |
-  welcome_screen_seen
+# welcome_screen_seen
   is_child_in_school
   before_you_start_screen_seen
   requestor.language
@@ -46,7 +46,7 @@ code: |
     pass
   requestor.name.first
   requestor.address.address
-  requestor.preferred_phone_number
+  requestor.phone_number
   if is_child_in_school == False:
     student.grade = "Not yet in school"
   if requestor.right_to_send == 'Student':
@@ -193,7 +193,7 @@ id: requestor phone number
 question: |
   What is your preferred phone number?
 fields:
-  - Phone Number: requestor.preferred_phone_number
+  - Phone Number: requestor.phone_number
 ---
 id: student name
 question: |
