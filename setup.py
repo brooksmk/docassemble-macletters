@@ -43,9 +43,9 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.macletters',
-      version='0.0.1',
+      version='0.0.2',
       description=('A set of letters developed for MAC.'),
-      long_description='# docassemble.macletters\n\nA set of letters developed for MAC.\n\n## Author\n\nmatt.w.brooks@gmail.com\n\n',
+      long_description='# docassemble.macletters\r\n\r\nA set of letters developed for MAC.\r\n\r\n## Author\r\n\r\nmatt.w.brooks@gmail.com\r\n\r\n',
       long_description_content_type='text/markdown',
       author='Matt Brooks',
       author_email='matt.w.brooks@gmail.com',
