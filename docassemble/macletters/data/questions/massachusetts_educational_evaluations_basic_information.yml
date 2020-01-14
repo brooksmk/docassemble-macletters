@@ -1,0 +1,373 @@
+---
+modules:
+    - docassemble.base.util
+    - docassemble.base.legal
+    - docassemble.income.income
+    - dateutil
+    - .educational_evaluations
+
+---
+metadata:
+    description: |
+        Basic information, objects, and module imports needed for all educational evaluation request letters
+    authors:
+        - name: Matt Brooks
+          organization: Lemma Legal
+    revision_date: 2019-12-18
+---
+objects:
+    - requestor: Individual
+    - school: Person
+---
+mandatory: True
+objects:
+    - school.recipient: Individual
+    - school.special_education_director: Individual
+    - school.special_education_coordinator: Individual
+    - student: Individual
+    - evaluations_list: DAList
+    - evaluation: DAObject
+---
+id: interview order
+comment: |
+	## Mandatory block that determines interview order.
+mandatory: True
+code: |
+  welcome_screen_seen
+  is_child_in_school
+  before_you_start_screen_seen
+  requestor.language
+  if requestor.language == 'Other':
+    kick_out_language
+  requestor.right_to_send
+  if requestor.right_to_send == 'Other':
+    kick_out_requestor
+  else:
+    pass
+  requestor.name.first
+  requestor.address.address
+  requestor.preferred_phone_number
+  if is_child_in_school == False:
+    student.grade = "Not yet in school"
+  if requestor.right_to_send == 'Student':
+    student.name.first = requestor.name.first
+    student.name.last = requestor.name.last
+    student.language = requestor.language
+  else:
+    student.name.first
+  student.birthdate
+  if student.grade == "Not yet in school":
+    student.grade = 'soon-to-be'
+    school.special_education_coordinator.requestor_knows_name = False
+    school.recipient = school.special_education_director
+  else:
+    school.recipient = school.special_education_coordinator
+    if not school.special_education_coordinator.requestor_knows_name:
+      school.special_education_coordinator.name = "Special Education Coordinator"
+  school.recipient.name
+  if not school.special_education_director.requestor_knows_name:
+    school.special_education_director.name = "Special Education Director"
+  else:
+    school.special_education_director.name.first
+  if not (school.special_education_director.requestor_knows_address and (student.grade != "soon-to-be")):
+    pass
+  else:
+    school.special_education_director.address.address
+  if not student.grade == "soon-to-be": 
+    school.address.address
+  else:
+    pass
+  if school.special_education_director.requestor_knows_address == False:
+    school.special_education_director.address = None
+
+---
+id: welcome screen
+field: welcome_screen_seen
+question: |
+  Welcome to MAC's Request for Initial Special Education Evaluation Interview.
+subquestion: |
+  The following questions will help you write a letter to request a school special education evaluation for your child or a child that you know.  
+  You might want to request a school {evaluation} if you think your child or a child that you know needs services to learn.
+  If you want to speak to a person before deciding if you want to request an evaluation, you can call or send an email to our  [Helpline](https://massadvocates.org/helpline/) at Massachusetts Advocates for Children.  
+  
+  It might take up to 3 business days for a person to respond to your call or email. 
+
+  [Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/)
+
+  These questions will take approximately **15 minutes** to fill out. When done, you can email the letter directly to the school district by email 
+  or you can print the letter and bring it to the school yourself.
+
+  **IMPORTANT!** If you bring it to the school be sure print a copy for yourself. 
+  If you can’t print a copy for yourself, when you bring the letter to the school, ask them to make a copy for you to keep for your records.
+terms:
+  evaluation: |
+    An evaluation is testing that a specialist does to see how your child is learning and developing. The specialist may also recommend services and supports for your child as part of their educational programming. An evaluation is sometimes called an assessment.
+---
+id: is child in school screen
+question: |
+  Is the child this request is for in school?
+yesno: is_child_in_school
+---
+if: |
+  is_child_in_school == False
+id: before you start screen child not in school
+field: before_you_start_screen_seen
+question: |
+  Before you start, you will need the name and address of the special education director for your child's school. You should be able to find it [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx)
+ 
+  You will also need the child’s full name and date of birth.  
+under: |
+  
+ 
+  This is not legal advice or medical advice. Contact a lawyer if you need legal advice. Contact your child’s pediatrician if you have questions about what evaluations your child 
+  may need after completing this questionnaire. This is not intended to diagnose any condition, but rather to suggest areas in which your child may need support to 
+  learn based on your observations and concerns of your child.
+
+---
+if: |
+  is_child_in_school == True
+id: before you start screen child in school
+field: before_you_start_screen_seen
+question: |
+  Before you start, you will need the name and address of the child's school. You will also need the child’s full name and date of birth. 
+  It is helpful if you have the name of the {special education coordinator} at your child’s school or the name of the special education director.  
+ 
+under: |
+
+  This is not legal advice or medical advice. Contact a lawyer if you need legal advice. Contact your child’s pediatrician if you have questions about what evaluations your child 
+  may need after completing this questionnaire. This is not intended to diagnose any condition, but rather to suggest areas in which your child may need support to 
+  learn based on your observations and concerns of your child.
+terms:
+  special education coordinator: |
+    The name of the special education coordinator should be listed on your child’s IEP.  If you do not know the name of the special education coordinator, 
+    you can try looking at the school webpage or doing an internet search using your child’s school district.
+
+---
+id: primary language
+question: |
+  What is your primary language?
+fields:
+    - Language: requestor.language
+      input type: radio
+      choices:
+        - English
+        - Spanish
+        - Other
+--- 
+id: requestor right to send
+question: |
+  Who will this letter be from?
+fields:
+    - Relationship: requestor.right_to_send
+      input type: radio
+      choices:
+        - Parent
+        - Legal Guardian
+        - Authorized Advocate
+        - Student
+        - Other
+---
+id: requestor name
+question: |
+  Who are you?
+fields:
+    - First Name: requestor.name.first
+    - Last Name: requestor.name.last
+---
+id: requestor address
+question: |
+  What is your address?
+fields:
+  - Street Address: requestor.address.address
+    address autocomplete: True
+  - Unit: requestor.address.unit
+    required: False
+  - City: requestor.address.city
+  - State: requestor.address.state
+    code: |
+      states_list()
+    default: MA
+  - Zip Code: requestor.address.zip
+---
+id: requestor phone number
+question: |
+  What is your preferred phone number?
+fields:
+  - Phone Number: requestor.preferred_phone_number
+---
+id: student name
+question: |
+  % if requestor.right_to_send == 'Student':
+  What is your name?
+  % else:
+  What is the name of the student who this request is for?
+  % endif
+fields:
+  - First Name: student.name.first
+  - Last Name: student.name.last
+---
+id: student information
+question: |
+  % if requestor.right_to_send == 'Student':
+  Tell me about yourself.
+  % else:
+  Tell me about ${student.name.first}.
+  % endif
+fields:
+    - ${student.name.first}'s Birthdate: student.birthdate
+      datatype: date
+    - ${student.name.first}'s Gender: student.gender
+      input type: radio
+      choices:
+        - Male: male
+        - Female: female
+        - Other: other
+    - ${student.name.first}'s Grade: student.grade
+      hide if:
+        code: |
+          is_child_in_school == False
+      choices:
+        - Not yet in school
+        - Pre-K
+        - Kindergarten
+        - First
+        - Second
+        - Third
+        - Fourth
+        - Fifth
+        - Sixth
+        - Seventh
+        - Eighth
+        - Ninth
+        - Tenth
+        - Eleventh
+        - Twelfth
+    - ${student.name.first}'s language: student.language
+      input type: radio
+      choices:
+        - English
+        - Spanish
+        - Other
+    - Other Language: student.language
+      show if:
+        variable: student.language
+        is: Other
+    ## - Year of Enrollment at School: student.enrollment_year
+    ##  datatype: number
+    ## currently not used in any of the letters. May need to re-implement later.
+---
+id: school information
+question: |
+  % if requestor.right_to_send == "Student":
+  Where do you go to school?
+  % elif student.grade == 'Not yet in school':
+  Where will ${ student.name.first } go to school?
+  % else:
+  Where does ${ student.name.first } go to school?
+  % endif
+fields:
+    - School Name: school.name
+    - Street Address: school.address.address
+      address autocomplete: True
+    - City: school.address.city
+    - State: school.address.state
+      default: MA
+    - Zip Code: school.address.zip
+---
+id: special education director address in school
+question: |
+  Please fill out the following information.
+fields:
+    - "Do you know the Special Education Director's address?": school.special_education_director.requestor_knows_address
+      datatype: yesnoradio
+    - Street Address: school.special_education_director.address.address
+      show if: school.special_education_director.requestor_knows_address
+      address autocomplete: True
+    - City: school.special_education_director.address.city
+      show if: school.special_education_director.requestor_knows_address
+    - State: school.special_education_director.address.state
+      show if: school.special_education_director.requestor_knows_address
+      default: MA
+    - Zip Code: school.special_education_director.address.zip
+      show if: school.special_education_director.requestor_knows_address
+under: |
+  Because ${student.name.first} is not yet in school, you need to send this letter to the special education director
+  for where you live. You can find out who your special education director is by searching [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx).
+---
+id: special education coordinator information
+question: |
+  Please fill in the following information.
+fields:
+  - "Do you know the name of the {special education coordinator} for ${ student.name.first }?": school.special_education_coordinator.requestor_knows_name
+    datatype: yesnoradio
+  - Recipient Title: school.recipient.title
+    input type: radio
+    show if: school.special_education_coordinator.requestor_knows_name
+    choices:
+      - Dr.
+      - Mrs.
+      - Miss
+      - Ms.
+      - Mr.
+  - Recipient First Name: school.special_education_coordinator.name.first
+    show if: school.special_education_coordinator.requestor_knows_name
+  - Recipient Last Name: school.special_education_coordinator.name.last
+    show if: school.special_education_coordinator.requestor_knows_name
+under: |
+   The name of the special education coordinator should be listed on your child’s IEP.  If you do not know the name of the special education coordinator, 
+   you can try looking at the school webpage or doing an internet search using your child’s school district.
+terms:
+  IEP: |
+    What is an IEP? An IEP is an Individualized Education Program.  It tells the school ${ student.name.first } has a disability and needs 
+    certain services and supports to learn. The IEP describes the services and supports the school must give to ${ student.name.first }. 
+    The evaluations the school does might show that ${ student.name.first } needs an IEP. If ${ student.name.first } already has an IEP, 
+    the evaluations might show that ${ student.name.first } needs more services.
+  special education coordinator: |
+    The name of the special education coordinator should be listed on your child’s IEP.  If you do not know the name of the special education coordinator, 
+    you can try looking at the school webpage or doing an internet search using your child’s school district.
+---
+id: special education director information
+question: |
+  Please fill in the following information.
+fields:
+  - "Do you know the name of the Special Education Director for the school district?": school.special_education_director.requestor_knows_name
+    datatype: yesnoradio
+  - Education Director Title: school.special_education_director.title
+    input type: radio
+    show if: school.special_education_director.requestor_knows_name
+    choices: 
+      - Dr.
+      - Mrs.
+      - Miss
+      - Ms.
+      - Mr.
+  - Special Education Director First Name: school.special_education_director.name.first
+    show if: school.special_education_director.requestor_knows_name
+  - Special Education Director Last Name: school.special_education_director.name.last
+    show if: school.special_education_director.requestor_knows_name
+under: |
+  Because ${student.name.first} is not yet in school, you need to send this letter to the special education director
+  for where you live. You can find out who your special education director is by searching [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx).
+comment : |
+  using ${student.pronoun_possessive("school district")} in the first field resulted in a parser error. Is this a bug?
+---
+id: kick out language
+event: kick_out_language
+question: |
+  We are sorry.
+under: |
+  At this time,  this resource is only available in English and in Spanish. 
+  
+  If you do not speak English or need help completing this form for any reason, 
+  please contact MAC’s helpline at 617-357-8431. You can leave a message with which language you speak, 
+  or you can complete any portion of this form ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/)) and include your language. 
+  A person will call you back with an interpreter if you need one. It may take up to 3 working days for someone to call you back.
+
+---
+id: kick out requestor
+event: kick_out_requestor
+question: |
+  It looks like someone else needs to request these evaluations.
+buttons:
+  - Exit: exit
+  - Restart: restart
