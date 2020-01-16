@@ -33,7 +33,7 @@ code: |
         student.evaluations_list.append(key)
   if 'I don't know' in selected_evaluations:
     call_the_hotline
-  # else:
+#  # else:
   #   educational_assessment = True
   #   if speech_and_language_therapy.any_true():
   #     student.evaluations_list.append('Speech and Language Therapy Evaluation')
@@ -67,7 +67,13 @@ code: |
   #   else:
   #     pass
   initial_request_concatenated = pdf_concatenate(initial_request_variable)
-  done
+  if done['emailed to the person receiving it']:
+    recipient.email
+    send_email(to=[recipient.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[pdf_concatenate(initial_request_variable), pdf_concatenate(educational_evaluations_copy_request_variable), pdf_concatenate(educational_evaluations_transition_assessment_variable)])
+  if done["emailed to me"]:
+    requestor.email
+    send_email(to=[requestor.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[initial_request_variable, educational_evaluations_copy_request_variable, educational_evaluations_transition_assessment_variable])
+
   end_screen
 ---
 id: confirm evaluations screen
@@ -364,7 +370,26 @@ under: |
   You may also be able to find the name of your district's special education director  by searching [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx).
 
   % endif
-field: done
+fields:
+  - "I want a copy of my letter...": assistive_technology
+    datatype: checkboxes
+    choices: 
+      - emailed to me
+      - emailed to the person receiving it
+    none of the above: |
+      I don't know.
+---
+id: recipient email screen
+question: |
+  What is ${recipient.name.full()}'s email?
+fields:
+  - ${recipient.name.full()} email: recipient.email
+---
+id: requestor email screen
+question: |
+  What is your email?
+fields:
+  - your email: requestor.email
 ---
 id: end screen initial request
 event: end_screen
