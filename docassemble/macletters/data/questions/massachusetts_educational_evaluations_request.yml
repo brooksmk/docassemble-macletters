@@ -20,7 +20,7 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
-    revision_date: 2020-01-14
+    revision_date: 2020-01-17
 ---
 id: interview order initial request
 mandatory: True
@@ -31,9 +31,8 @@ code: |
     for key in known_evaluations:
       if known_evaluations[key] == True:
         student.evaluations_list.append(key)
-  if 'I don't know' in selected_evaluations:
+  if 'I do not know' in selected_evaluations:
     call_the_hotline
-#  # else:
   #   educational_assessment = True
   #   if speech_and_language_therapy.any_true():
   #     student.evaluations_list.append('Speech and Language Therapy Evaluation')
@@ -94,7 +93,7 @@ fields:
       - Assistive Technology Evaluation
       - Transition Assessment
     none of the above: |
-      I don't know.
+      I do not know.
     default:
       code: |
         student.evaluations_list
@@ -345,21 +344,22 @@ question: |
 
   This is the evaluation request letter. You should send it right away:
 
-  [FILE lettergraphic.jpg]: ${ initial_request_variable }
+    [FILE lettergraphic.jpg]: ${ initial_request_variable }
 
   % if "Transition Assessment" in selected_evaluations:
+  
 
   This is a request for a Transition Assessment. You should send it at the same time as 
   the evaluation request letter.
-
-  [FILE lettergraphic.jpg] ${ educational_evaluations_transition_assessment_variable }
+  
 
   % endif
 
   This is a request for copies of the evaluations you have requested. Send it after
   the evaluations are complete:
-
-  [FILE lettergraphic.jpg]: ${ educational_evaluations_copy_request_variable }
+  
+  ${ educational_evaluations_copy_request_variable }
+    
 
 under: |
   % if is_child_in_school == False and school.special_education_director.address == None:
@@ -371,13 +371,31 @@ under: |
 
   % endif
 fields:
-  - "I want a copy of my letter...": assistive_technology
+  - "I want a copy of my letter...": done
     datatype: checkboxes
     choices: 
       - emailed to me
       - emailed to the person receiving it
-    none of the above: |
-      I don't know.
+comment: |
+  I tried displaying the images like this, but it didn't work. I need to talk to     Quinten:
+  
+    This is the evaluation request letter. You should send it right away:
+
+  [FILE lettergraphic.jpg]: ${ initial_request_variable } this doesn't work, talk to Quinten
+
+  % if "Transition Assessment" in selected_evaluations:
+
+  This is a request for a Transition Assessment. You should send it at the same time as 
+  the evaluation request letter.
+
+  [FILE lettergraphic.jpg]: ${ educational_evaluations_transition_assessment_variable } this doesn't work, talk to Quinten.
+
+  % endif
+
+  This is a request for copies of the evaluations you have requested. Send it after
+  the evaluations are complete:
+
+  [FILE lettergraphic.jpg]: ${ educational_evaluations_copy_request_variable } this doesn't work, talk to Quinten
 ---
 id: recipient email screen
 question: |
@@ -427,4 +445,4 @@ attachment:
   - name: educational_evaluations_transition_assessment_request_name
     variable name: educational_evaluations_transition_assessment_variable
     filename: educational_evaluations_transition_assessment_request
-    docx template file: educational_evaluations_transition_assessment_request_template
+    docx template file: educational_evaluations_transition_assessment_request_template.docx
