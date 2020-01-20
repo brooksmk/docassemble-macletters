@@ -13,7 +13,7 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
-    revision_date: 2020-01-14
+    revision_date: 2020-01-20
 ---
 objects:
     - requestor: Individual
@@ -33,7 +33,9 @@ comment: |
 	## Mandatory block that determines interview order.
 mandatory: True
 code: |
-# welcome_screen_seen
+  allow_chron = True
+  multi_user = True
+  # welcome_screen_seen
   is_child_in_school
   before_you_start_screen_seen
   requestor.language
@@ -369,5 +371,5 @@ event: kick_out_requestor
 question: |
   It looks like someone else needs to request these evaluations.
 buttons:
-  - Exit: exit
+  - Leave: leave
   - Restart: restart

@@ -20,20 +20,21 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
-    revision_date: 2020-01-14
+    revision_date: 2020-01-20
+---
+id: process_action initial request
+initial: True
+  code: |
+    process_action
 ---
 id: interview order initial request
 mandatory: True
 code: |
+  allow_chron = True
+  multi_user = True
   educational_evaluations_intro_screen
-  student.evaluations_list = list()
-  if known_evaluations.any_true():
-    for key in known_evaluations:
-      if known_evaluations[key] == True:
-        student.evaluations_list.append(key)
-  if 'I don't know' in selected_evaluations:
+  if selected_evaluations.all_false():
     call_the_hotline
-#  # else:
   #   educational_assessment = True
   #   if speech_and_language_therapy.any_true():
   #     student.evaluations_list.append('Speech and Language Therapy Evaluation')
@@ -73,14 +74,16 @@ code: |
   if done["emailed to me"]:
     requestor.email
     send_email(to=[requestor.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[initial_request_variable, educational_evaluations_copy_request_variable, educational_evaluations_transition_assessment_variable])
-
+  if wants_reminders:
+    recipient.email
+    letter_created_date = today()
   end_screen
 ---
 id: confirm evaluations screen
 question : |
-  These are the evaluations you selected
+  Please select the evaluations you want.
 fields:
-  - "These are the evaluations you selected. You can change them now if you want to.": selected_evaluations
+  - "Select your evaluations here.": selected_evaluations
     datatype: checkboxes
     choices:
       - Educational Assessment
@@ -94,10 +97,8 @@ fields:
       - Assistive Technology Evaluation
       - Transition Assessment
     none of the above: |
-      I don't know.
-    default:
-      code: |
-        student.evaluations_list
+      I do not know.
+
 help:
   label: |
     Need help? Not sure what these are? Click here.
@@ -345,21 +346,23 @@ question: |
 
   This is the evaluation request letter. You should send it right away:
 
-  [FILE lettergraphic.jpg]: ${ initial_request_variable }
+    [FILE lettergraphic.jpg]: ${ initial_request_variable }
 
-  % if "Transition Assessment" in selected_evaluations:
+  % if selected_evaluations["Transition Assessment"] == True:
+  
 
   This is a request for a Transition Assessment. You should send it at the same time as 
   the evaluation request letter.
-
-  [FILE lettergraphic.jpg] ${ educational_evaluations_transition_assessment_variable }
+  
+  ${ educational_evaluations_transition_assessment_variable }
 
   % endif
 
   This is a request for copies of the evaluations you have requested. Send it after
   the evaluations are complete:
-
-  [FILE lettergraphic.jpg]: ${ educational_evaluations_copy_request_variable }
+  
+  ${ educational_evaluations_copy_request_variable }
+    
 
 under: |
   % if is_child_in_school == False and school.special_education_director.address == None:
@@ -371,13 +374,31 @@ under: |
 
   % endif
 fields:
-  - "I want a copy of my letter...": assistive_technology
+  - "I want a copy of my letter...": done
     datatype: checkboxes
     choices: 
       - emailed to me
       - emailed to the person receiving it
-    none of the above: |
-      I don't know.
+comment: |
+  I tried displaying the images like this, but it didn't work. I need to talk to Quinten:
+  
+    This is the evaluation request letter. You should send it right away:
+
+  [FILE lettergraphic.jpg]: ${ initial_request_variable } this doesn't work, talk to Quinten
+
+  % if "Transition Assessment" in selected_evaluations:
+
+  This is a request for a Transition Assessment. You should send it at the same time as 
+  the evaluation request letter.
+
+  [FILE lettergraphic.jpg]: ${ educational_evaluations_transition_assessment_variable } this doesn't work, talk to Quinten.
+
+  % endif
+
+  This is a request for copies of the evaluations you have requested. Send it after
+  the evaluations are complete:
+
+  [FILE lettergraphic.jpg]: ${ educational_evaluations_copy_request_variable } this doesn't work, talk to Quinten
 ---
 id: recipient email screen
 question: |
@@ -391,12 +412,19 @@ question: |
 fields:
   - your email: requestor.email
 ---
+id: wants reminders screen
+question: |
+  Do you want us to send you a reminder in 30 days?
+yesno: wants_reminders
+under: |
+  This will remind you to follow up with the school if you have not heard anything
+---
 id: end screen initial request
 event: end_screen
 question: |
   You are all done!
 buttons:
-  - Exit: exit
+  - Leave: leave
   - Restart: restart
 ---
 id: call the hotline initial request
@@ -405,7 +433,7 @@ question: |
   Please contact  MAC’s helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
   It may take up to three business days for someone to get back to you.
 buttons:
-  - Exit: exit
+  - Leave: leave
   - Restart: restart
 ---
 id: initial request attachment block
@@ -427,4 +455,24 @@ attachment:
   - name: educational_evaluations_transition_assessment_request_name
     variable name: educational_evaluations_transition_assessment_variable
     filename: educational_evaluations_transition_assessment_request
-    docx template file: educational_evaluations_transition_assessment_request_template
+    docx template file: educational_evaluations_transition_assessment_request_template.docx
+---
+id: reminder email template
+template: reminder_email_initial_request
+subject: |
+  Hey, it's been 30 days.
+content: |
+  Have you heard from the school yet?
+---
+event: cron_daily
+code: |
+  if task_not_yet_performed('30 day reminder email') and date_difference(starting=letter_created_date).days > 29 and wants_reminders:
+    send_email(to=requestor.email, template=reminder_email_initial_request, task='30 day reminder email')
+  if task_not_yet_performed('30 day reminder text') and date_difference(starting=letter_created_date).days > 29 and wants_reminders:
+    send_sms(to=requestor, body=Have you heard from the school yet?, task='30 day reminder text')
+  response()
+---
+event: cron_monthly
+code: |
+  if last_access_days() > 365:
+    command('exit')
