@@ -20,6 +20,7 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
+
     revision_date: 2020-01-20
 ---
 id: process_action initial request
@@ -84,6 +85,7 @@ question : |
   Please select the evaluations you want.
 fields:
   - "Select your evaluations here.": selected_evaluations
+
     datatype: checkboxes
     choices:
       - Educational Assessment
@@ -98,7 +100,7 @@ fields:
       - Transition Assessment
     none of the above: |
       I do not know.
-
+      
 help:
   label: |
     Need help? Not sure what these are? Click here.
@@ -349,12 +351,15 @@ question: |
     [FILE lettergraphic.jpg]: ${ initial_request_variable }
 
   % if selected_evaluations["Transition Assessment"] == True:
+
   
 
   This is a request for a Transition Assessment. You should send it at the same time as 
   the evaluation request letter.
   
+
   ${ educational_evaluations_transition_assessment_variable }
+
 
   % endif
 
@@ -380,7 +385,9 @@ fields:
       - emailed to me
       - emailed to the person receiving it
 comment: |
+
   I tried displaying the images like this, but it didn't work. I need to talk to Quinten:
+
   
     This is the evaluation request letter. You should send it right away:
 
@@ -419,12 +426,14 @@ yesno: wants_reminders
 under: |
   This will remind you to follow up with the school if you have not heard anything
 ---
+
 id: end screen initial request
 event: end_screen
 question: |
   You are all done!
 buttons:
   - Leave: leave
+
   - Restart: restart
 ---
 id: call the hotline initial request
@@ -476,3 +485,4 @@ event: cron_monthly
 code: |
   if last_access_days() > 365:
     command('exit')
+
