@@ -21,7 +21,7 @@ metadata:
         - name: Matt Brooks
           organization: Lemma Legal
 
-    revision_date: 2020-01-20
+    revision_date: 2020-01-26
 ---
 id: process action initial request
 initial: True
@@ -70,13 +70,13 @@ code: |
   #     pass
   initial_request_concatenated = pdf_concatenate(initial_request_variable)
   if done['emailed to the person receiving it']:
-    recipient.email
-    send_email(to=[recipient.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[pdf_concatenate(initial_request_variable), pdf_concatenate(educational_evaluations_copy_request_variable), pdf_concatenate(educational_evaluations_transition_assessment_variable)])
+    school.recipient.email
+    send_email(to=[school.recipient.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[pdf_concatenate(initial_request_variable), pdf_concatenate(educational_evaluations_copy_request_variable), pdf_concatenate(educational_evaluations_transition_assessment_variable)])
   if done["emailed to me"]:
     requestor.email
     send_email(to=[requestor.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[initial_request_variable, educational_evaluations_copy_request_variable, educational_evaluations_transition_assessment_variable])
   if wants_reminders:
-    recipient.email
+    requestor.email
     letter_created_date = today()
   end_screen
 ---
@@ -404,9 +404,9 @@ comment: |
 ---
 id: recipient email screen
 question: |
-  What is ${recipient.name.full()}'s email?
+  What is ${school.recipient.name.full()}'s email?
 fields:
-  - ${recipient.name.full()} email: recipient.email
+  - ${school.recipient.name.full()} email: school.recipient.email
 ---
 id: requestor email screen
 question: |

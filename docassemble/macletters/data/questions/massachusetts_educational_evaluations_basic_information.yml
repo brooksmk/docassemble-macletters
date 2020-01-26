@@ -14,7 +14,7 @@ metadata:
         - name: Matt Brooks
           organization: Lemma Legal
 
-    revision_date: 2020-01-20
+    revision_date: 2020-01-26
 ---
 objects:
     - requestor: Individual
@@ -62,9 +62,11 @@ code: |
   if student.grade == "Not yet in school":
     student.grade = 'soon-to-be'
     school.special_education_coordinator.requestor_knows_name = False
-    school.recipient = school.special_education_director
+    school.recipient.name = school.special_education_director.name
+    school.recipient.address = school.special_education_director.address
   else:
-    school.recipient = school.special_education_coordinator
+    school.recipient.name = school.special_education_coordinator.name
+    school.recipient.address = school.special_education_coordinator.address
     if not school.special_education_coordinator.requestor_knows_name:
       school.special_education_coordinator.name = "Special Education Coordinator"
   school.recipient.name
