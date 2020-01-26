@@ -23,10 +23,10 @@ metadata:
 
     revision_date: 2020-01-20
 ---
-id: process_action initial request
+id: process action initial request
 initial: True
-  code: |
-    process_action
+code: |
+  process_action()
 ---
 id: interview order initial request
 mandatory: True
@@ -346,27 +346,22 @@ id: letter screen
 question: |
   Here are your letters:
 
-  This is the evaluation request letter. You should send it right away:
-
-    [FILE lettergraphic.jpg]: ${ initial_request_variable }
-
-  % if selected_evaluations["Transition Assessment"] == True:
-
+  >This is the evaluation request letter. You should send it right away: 
   
-
-  This is a request for a Transition Assessment. You should send it at the same time as 
-  the evaluation request letter.
+  ${ pdf_concatenate(initial_request_variable) }     
   
-
-  ${ educational_evaluations_transition_assessment_variable }
-
-
+  % if selected_evaluations["Transition Assessment"] == True:     
+  
+  
+   >This is a request for a Transition Assessment. You should send it at the same time as the evaluation request letter. 
+   
+   ${ pdf_concatenate(educational_evaluations_transition_assessment_variable) }
   % endif
-
-  This is a request for copies of the evaluations you have requested. Send it after
+  
+  >This is a request for copies of the evaluations you have requested. Send it after
   the evaluations are complete:
   
-  ${ educational_evaluations_copy_request_variable }
+  ${ pdf_concatenate(educational_evaluations_copy_request_variable) }
     
 
 under: |
@@ -478,7 +473,7 @@ code: |
   if task_not_yet_performed('30 day reminder email') and date_difference(starting=letter_created_date).days > 29 and wants_reminders:
     send_email(to=requestor.email, template=reminder_email_initial_request, task='30 day reminder email')
   if task_not_yet_performed('30 day reminder text') and date_difference(starting=letter_created_date).days > 29 and wants_reminders:
-    send_sms(to=requestor, body=Have you heard from the school yet?, task='30 day reminder text')
+    send_sms(to=requestor, body='Have you heard from the school yet?', task='30 day reminder text')
   response()
 ---
 event: cron_monthly
