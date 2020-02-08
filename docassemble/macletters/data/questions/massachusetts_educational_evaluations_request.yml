@@ -21,7 +21,7 @@ metadata:
         - name: Matt Brooks
           organization: Lemma Legal
 
-    revision_date: 2020-01-26
+    revision_date: 2020-02-07
 ---
 id: process action initial request
 initial: True
@@ -33,6 +33,7 @@ mandatory: True
 code: |
   allow_chron = True
   multi_user = True
+  count = 0
   educational_evaluations_intro_screen
   if selected_evaluations.all_false():
     call_the_hotline
@@ -68,6 +69,10 @@ code: |
   #     student.evaluations_list.append('Assistive Technology Evaluation')
   #   else:
   #     pass
+  while count < 1:
+    if selected_evaluations['Other'] == True:
+      custom_evaluations = other_evaluations.split('\n')
+    count = count + 1
   initial_request_concatenated = pdf_concatenate(initial_request_variable)
   if done['emailed to the person receiving it']:
     school.recipient.email
@@ -98,9 +103,14 @@ fields:
       - Augmentative and Alternative Communication Evaluation
       - Assistive Technology Evaluation
       - Transition Assessment
+      - Other
     none of the above: |
       I do not know.
-      
+  - Other Evaluation (put each evaluation on a separate line) you may want to [call the hotline](https://massadvocates.org/helpline/): other_evaluations
+    datatype: area
+    show if:
+      variable: selected_evaluations['Other']
+      is: True
 help:
   label: |
     Need help? Not sure what these are? Click here.
@@ -416,10 +426,10 @@ fields:
 ---
 id: wants reminders screen
 question: |
-  Do you want us to send you a reminder in 30 days?
+  The School District is required to provide you with a consent form within five school   days of receiving this form.
 yesno: wants_reminders
 under: |
-  This will remind you to follow up with the school if you have not heard anything
+  Would you like a reminder to follow up with the school?
 ---
 
 id: end screen initial request
@@ -470,10 +480,10 @@ content: |
 ---
 event: cron_daily
 code: |
-  if task_not_yet_performed('30 day reminder email') and date_difference(starting=letter_created_date).days > 29 and wants_reminders:
-    send_email(to=requestor.email, template=reminder_email_initial_request, task='30 day reminder email')
-  if task_not_yet_performed('30 day reminder text') and date_difference(starting=letter_created_date).days > 29 and wants_reminders:
-    send_sms(to=requestor, body='Have you heard from the school yet?', task='30 day reminder text')
+  if task_not_yet_performed('10 day reminder email') and date_difference(starting=letter_created_date).days > 10 and wants_reminders:
+    send_email(to=requestor.email, template=reminder_email_initial_request, task='10 day reminder email')
+  if task_not_yet_performed('10 day reminder text') and date_difference(starting=letter_created_date).days > 10 and wants_reminders:
+    send_sms(to=requestor, body='Have you heard from the school yet?', task='10 day reminder text')
   response()
 ---
 event: cron_monthly
