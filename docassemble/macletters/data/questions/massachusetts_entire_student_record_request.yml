@@ -20,7 +20,12 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
-    revision_date: 2019-12-20
+    revision_date: 2019-02-10
+---
+id: child is in school if you need a school record
+initial: True
+code: |
+  is_child_in_school = True
 ---
 id: interview order entire record
 mandatory: True
