@@ -21,7 +21,7 @@ metadata:
         - name: Matt Brooks
           organization: Lemma Legal
 
-    revision_date: 2020-02-07
+    revision_date: 2020-02-21
 ---
 id: process action initial request
 initial: True
@@ -69,10 +69,12 @@ code: |
   #     student.evaluations_list.append('Assistive Technology Evaluation')
   #   else:
   #     pass
-  while count < 1:
-    if selected_evaluations['Other'] == True:
+  if selected_evaluations['Other'] == True:
+    while count < 1:
       custom_evaluations = other_evaluations.split('\n')
-    count = count + 1
+      count = count + 1
+  else:
+    custom_evaluations = list()
   initial_request_concatenated = pdf_concatenate(initial_request_variable)
   if done['emailed to the person receiving it']:
     school.recipient.email
