@@ -36,6 +36,7 @@ code: |
   
 ---
 mandatory: True
+scan for variables: False
 id: interview order independent eval request
 code: |
   independent_evaluations_intro_screen
