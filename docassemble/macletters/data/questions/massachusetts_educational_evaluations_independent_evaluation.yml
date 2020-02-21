@@ -41,10 +41,12 @@ code: |
   independent_evaluations_intro_screen
   if selected_evaluations.all_false():
     call_the_hotline
-  while count < 1:
-    if selected_evaluations['Other'] == True:
+  if selected_evaluations['Other'] == True:
+    while count < 1:
       custom_evaluations = other_evaluations.split('\n')
-    count = count + 1
+      count = count + 1
+  else:
+    custom_evaluations = list()
   if evaluators.there_are_any == False:
     call_the_hotline
   if comfortable_sharing_income == True:
