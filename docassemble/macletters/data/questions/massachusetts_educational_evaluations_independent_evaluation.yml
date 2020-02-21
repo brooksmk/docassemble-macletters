@@ -35,16 +35,14 @@ code: |
   evaluators[i].complete = True
   
 ---
+mandatory: True
 id: interview order independent eval request
 code: |
-  count = 0
   independent_evaluations_intro_screen
   if selected_evaluations.all_false():
     call_the_hotline
-  while count < 1:
-    if selected_evaluations['Other'] == True:
-      custom_evaluations = other_evaluations.split('\n')
-    count = count + 1
+  if selected_evaluations['Other'] == True:
+    custom_evaluations
   if evaluators.there_are_any == False:
     call_the_hotline
   if comfortable_sharing_income == True:
@@ -57,15 +55,35 @@ code: |
   else:
     free_or_reduced_lunch = False
     below_400_percent = False
-  independent_evaluation_request_concatenated = pdf_concatenate(independent_evaluation_request_variable)
+  independent_evaluation_request_concatenated
   if done['emailed to the person receiving it']:
     school.recipient.email
-    send_email(to=[school.recipient.email], subject=str(student.name.full()) + " Independent Evaluation Request", attachments=[pdf_concatenate(independent_evaluation_request_variable)])
+    sent_school_email
     end_screen
   if done["emailed to me"]:
     requestor.email
-    send_email(to=[requestor.email], subject=str(student.name.full()) + " Independent Evaluation Request", attachments=[independent_evaluation_request_variable])
+    sent_requestor_email
     end_screen
+---
+code: |
+  if task_not_yet_performed('sent school email'):
+    send_email(to=[school.recipient.email], 
+      subject=str(student.name.full()) + " Independent Evaluation Request", 
+      attachments=[pdf_concatenate(independent_evaluation_request_variable)], task="sent school email")
+  sent_school_email = True
+---
+code: |
+  if task_not_yet_performed("sent requestor email"):
+    send_email(to=[requestor.email], 
+      subject=str(student.name.full()) + " Independent Evaluation Request", 
+      attachments=[independent_evaluation_request_variable], task="sent requestor email")
+  sent_requestor_email = True
+---
+code: |
+  independent_evaluation_request_concatenated = pdf_concatenate(independent_evaluation_request_variable)
+---
+code: |
+  custom_evaluations = other_evaluations.split('\n')
 ---
 id: confirm independent evaluations screen
 question : |
@@ -188,7 +206,6 @@ under: |
   Sign your name here by using your mouse or touching your phone's screen.
   Press clear if you want to start over.
 ---
-mandatory: True
 id: independent evaluation letter screen
 question: |
   Here are your letters:
@@ -232,7 +249,6 @@ yesno: wants_reminders
 under: |
   Would you like a reminder to follow up with the school?
 ---
-mandatory: True
 id: end screen independent evaluation
 event: end_screen
 question: |

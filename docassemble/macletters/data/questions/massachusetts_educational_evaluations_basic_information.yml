@@ -30,6 +30,7 @@ objects:
     - evaluation: DAObject
 ---
 id: interview order
+scan for variables: False
 comment: |
 	## Mandatory block that determines interview order.
 mandatory: True
