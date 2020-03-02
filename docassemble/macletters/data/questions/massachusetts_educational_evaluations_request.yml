@@ -79,9 +79,9 @@ code: |
   if done['emailed to the person receiving it']:
     school.recipient.email
     send_email(to=[school.recipient.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[pdf_concatenate(initial_request_variable), pdf_concatenate(educational_evaluations_copy_request_variable), pdf_concatenate(educational_evaluations_transition_assessment_variable)])
-  if done["emailed to me"]:
-    requestor.email
-    send_email(to=[requestor.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[initial_request_variable, educational_evaluations_copy_request_variable, educational_evaluations_transition_assessment_variable])
+    if done['emailed to me']:
+      requestor.email
+      send_email(to=[requestor.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[initial_request_variable, educational_evaluations_copy_request_variable, educational_evaluations_transition_assessment_variable])
   if wants_reminders:
     requestor.email
     letter_created_date = today()
