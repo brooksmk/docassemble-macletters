@@ -11,6 +11,7 @@ include:
 ---
 features:
   bootstrap theme: mac-bootstrap.css
+  progress bar: True
 ---
 metadata:
     title: | 

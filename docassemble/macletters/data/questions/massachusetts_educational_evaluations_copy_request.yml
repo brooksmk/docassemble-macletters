@@ -11,6 +11,7 @@ include:
 ---
 features:
   bootstrap theme: mac-bootstrap.css
+  progress bar: True
 ---
 metadata:
     title: | 
@@ -20,7 +21,7 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
-    revision_date: 2019-12-20
+    revision_date: 2020-06-20
 ---
 id: interview order initial request
 mandatory: True

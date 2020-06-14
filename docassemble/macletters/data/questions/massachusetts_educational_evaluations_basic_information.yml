@@ -14,11 +14,15 @@ metadata:
         - name: Matt Brooks
           organization: Lemma Legal
 
-    revision_date: 2020-01-26
+    revision_date: 2020-06-10
 ---
 objects:
     - requestor: Individual
     - school: Person
+---
+features:
+  bootstrap theme: mac-bootstrap.css
+  progress bar: True
 ---
 mandatory: True
 objects:
@@ -37,8 +41,9 @@ code: |
   allow_chron = True
   multi_user = True
   # welcome_screen_seen
-  is_child_in_school
   before_you_start_screen_seen
+  if not is_child_in_school:
+    call_the_hotline
   requestor.language
   if requestor.language == 'Other':
     kick_out_language
@@ -58,7 +63,7 @@ code: |
     student.language = requestor.language
   else:
     student.name.first
-  student.birthdate
+  student.age
   if student.grade == "Not yet in school":
     student.grade = 'soon-to-be'
     school.special_education_coordinator.requestor_knows_name = False
@@ -168,7 +173,6 @@ fields:
       choices:
         - Parent
         - Legal Guardian
-        - Authorized Advocate
         - Student
         - Other
 ---
@@ -193,12 +197,16 @@ fields:
       states_list()
     default: MA
   - Zip Code: requestor.address.zip
+    required: False
 ---
-id: requestor phone number
+id: requestor phone number and email
 question: |
-  What is your preferred phone number?
+  What is your preferred phone number and email?
 fields:
   - Phone Number: requestor.phone_number
+    required: False
+  - Email: requestor.email
+    required: False
 ---
 id: student name
 question: |
@@ -219,7 +227,7 @@ question: |
   Tell me about ${student.name.first}.
   % endif
 fields:
-    - ${student.name.first}'s Birthdate: student.birthdate
+    - ${student.name.first}'s Age: student.age
       datatype: date
     - ${student.name.first}'s Gender: student.gender
       input type: radio
@@ -368,6 +376,15 @@ under: |
   or you can complete any portion of this form ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/)) and include your language. 
   A person will call you back with an interpreter if you need one. It may take up to 3 working days for someone to call you back.
 
+---
+id: call the hotline basic information
+event: call_the_hotline
+question: |
+  Please contact  MAC’s helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
+  It may take up to three business days for someone to get back to you.
+buttons:
+  - Leave: leave
+  - Restart: restart
 ---
 id: kick out requestor
 event: kick_out_requestor

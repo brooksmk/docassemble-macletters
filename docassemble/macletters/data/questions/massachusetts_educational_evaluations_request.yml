@@ -11,6 +11,7 @@ include:
 ---
 features:
   bootstrap theme: mac-bootstrap.css
+  progress bar: True
 ---
 metadata:
     title: | 
@@ -21,7 +22,7 @@ metadata:
         - name: Matt Brooks
           organization: Lemma Legal
 
-    revision_date: 2020-02-21
+    revision_date: 2020-06-10
 ---
 id: process action initial request
 initial: True
@@ -87,7 +88,7 @@ code: |
     letter_created_date = today()
   end_screen
 ---
-id: confirm evaluations screen
+id: confirm evaluations screen over 14
 question : |
   Please select the evaluations you want.
 fields:
