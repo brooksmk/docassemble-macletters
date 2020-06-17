@@ -21,8 +21,7 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
-
-    revision_date: 2020-06-10
+    revision_date: 2020-06-16
 ---
 id: process action initial request
 initial: True
@@ -88,12 +87,53 @@ code: |
     letter_created_date = today()
   end_screen
 ---
+if: |
+  student.age < 14
 id: confirm evaluations screen over 14
 question : |
   Please select the evaluations you want.
 fields:
   - "Select your evaluations here.": selected_evaluations
-
+    datatype: checkboxes
+    choices:
+      - Educational Assessment
+      - Speech and Language Therapy Evaluation
+      - Social Pragmatic Language
+      - Occupational Therapy
+      - Functional Behavior Assessment
+      - Psychological Assessment
+      - Physical Therapy
+      - Augmentative and Alternative Communication Evaluation
+      - Assistive Technology Evaluation
+      - Other
+    none of the above: |
+      I do not know.
+  - Other Evaluation (put each evaluation on a separate line) you may want to [call the hotline](https://massadvocates.org/helpline/): other_evaluations
+    datatype: area
+    show if:
+      variable: selected_evaluations['Other']
+      is: True
+help:
+  label: |
+    Need help? Not sure what these are? Click here.
+  content: |
+    Educational Assessment - Explanatory Text
+    Speech and Language Therapy Evaluation - Explanatory Text
+    Social Pragmatic Language - Explanatory Text
+    Occupational Therapy - Explanatory Text
+    Functional Behavior Assessment - Explanatory Text
+    Psychological Assessment - Explanatory Text
+    Physical Therapy - Explanatory Text
+    Augmentative and Alternative Communication Evaluation - Explanatory Text
+    Assistive Technology Evaluation - Explanatory Text
+---
+if: |
+  student.age >= 14
+id: confirm evaluations screen over 14
+question : |
+  Please select the evaluations you want.
+fields:
+  - "Select your evaluations here.": selected_evaluations
     datatype: checkboxes
     choices:
       - Educational Assessment
@@ -127,6 +167,7 @@ help:
     Physical Therapy - Explanatory Text
     Augmentative and Alternative Communication Evaluation - Explanatory Text
     Assistive Technology Evaluation - Explanatory Text
+
 
 ---
 id: skip to end screen

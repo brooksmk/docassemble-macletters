@@ -14,7 +14,7 @@ metadata:
         - name: Matt Brooks
           organization: Lemma Legal
 
-    revision_date: 2020-06-10
+    revision_date: 2020-06-17
 ---
 objects:
     - requestor: Individual
@@ -33,6 +33,9 @@ objects:
     - evaluations_list: DAList
     - evaluation: DAObject
 ---
+code: |
+  student.age = student.age_in_years()
+---
 id: interview order
 comment: |
 	## Mandatory block that determines interview order.
@@ -41,9 +44,9 @@ code: |
   allow_chron = True
   multi_user = True
   # welcome_screen_seen
-  before_you_start_screen_seen
   if not is_child_in_school:
     call_the_hotline
+  before_you_start_screen_seen
   requestor.language
   if requestor.language == 'Other':
     kick_out_language
@@ -63,7 +66,6 @@ code: |
     student.language = requestor.language
   else:
     student.name.first
-  student.age
   if student.grade == "Not yet in school":
     student.grade = 'soon-to-be'
     school.special_education_coordinator.requestor_knows_name = False
@@ -75,20 +77,20 @@ code: |
     if not school.special_education_coordinator.requestor_knows_name:
       school.special_education_coordinator.name = "Special Education Coordinator"
   school.recipient.name
-  if not school.special_education_director.requestor_knows_name:
-    school.special_education_director.name = "Special Education Director"
-  else:
-    school.special_education_director.name.first
-  if not (school.special_education_director.requestor_knows_address and (student.grade != "soon-to-be")):
-    pass
-  else:
-    school.special_education_director.address.address
+  # if not school.special_education_director.requestor_knows_name:
+    # school.special_education_director.name = "Special Education Director"
+  # else:
+    # school.special_education_director.name.first
+  # if not (school.special_education_director.requestor_knows_address and (student.grade != "soon-to-be")):
+    # pass
+  # else:
+    # school.special_education_director.address.address
   if not student.grade == "soon-to-be": 
     school.address.address
   else:
     pass
-  if school.special_education_director.requestor_knows_address == False:
-    school.special_education_director.address = None
+  # if school.special_education_director.requestor_knows_address == False:
+  school.special_education_director.address = None
 
 ---
 id: welcome screen
@@ -227,7 +229,7 @@ question: |
   Tell me about ${student.name.first}.
   % endif
 fields:
-    - ${student.name.first}'s Age: student.age
+    - ${student.name.first}'s Birthdate: student.birthdate
       datatype: date
     - ${student.name.first}'s Gender: student.gender
       input type: radio
