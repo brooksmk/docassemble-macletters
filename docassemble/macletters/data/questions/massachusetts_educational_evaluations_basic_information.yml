@@ -14,11 +14,15 @@ metadata:
         - name: Matt Brooks
           organization: Lemma Legal
 
-    revision_date: 2020-01-26
+    revision_date: 2020-06-17
 ---
 objects:
     - requestor: Individual
     - school: Person
+---
+features:
+  bootstrap theme: mac-bootstrap.css
+  progress bar: True
 ---
 mandatory: True
 objects:
@@ -29,6 +33,9 @@ objects:
     - evaluations_list: DAList
     - evaluation: DAObject
 ---
+code: |
+  student.age = student.age_in_years()
+---
 id: interview order
 scan for variables: False
 comment: |
@@ -38,7 +45,8 @@ code: |
   allow_chron = True
   multi_user = True
   # welcome_screen_seen
-  is_child_in_school
+  if not is_child_in_school:
+    call_the_hotline
   before_you_start_screen_seen
   requestor.language
   if requestor.language == 'Other':
@@ -59,7 +67,6 @@ code: |
     student.language = requestor.language
   else:
     student.name.first
-  student.birthdate
   if student.grade == "Not yet in school":
     student.grade = 'soon-to-be'
     school.special_education_coordinator.requestor_knows_name = False
@@ -71,20 +78,20 @@ code: |
     if not school.special_education_coordinator.requestor_knows_name:
       school.special_education_coordinator.name = "Special Education Coordinator"
   school.recipient.name
-  if not school.special_education_director.requestor_knows_name:
-    school.special_education_director.name = "Special Education Director"
-  else:
-    school.special_education_director.name.first
-  if not (school.special_education_director.requestor_knows_address and (student.grade != "soon-to-be")):
-    pass
-  else:
-    school.special_education_director.address.address
+  # if not school.special_education_director.requestor_knows_name:
+    # school.special_education_director.name = "Special Education Director"
+  # else:
+    # school.special_education_director.name.first
+  # if not (school.special_education_director.requestor_knows_address and (student.grade != "soon-to-be")):
+    # pass
+  # else:
+    # school.special_education_director.address.address
   if not student.grade == "soon-to-be": 
     school.address.address
   else:
     pass
-  if school.special_education_director.requestor_knows_address == False:
-    school.special_education_director.address = None
+  # if school.special_education_director.requestor_knows_address == False:
+  school.special_education_director.address = None
 
 ---
 id: welcome screen
@@ -169,7 +176,6 @@ fields:
       choices:
         - Parent
         - Legal Guardian
-        - Authorized Advocate
         - Student
         - Other
 ---
@@ -194,12 +200,16 @@ fields:
       states_list()
     default: MA
   - Zip Code: requestor.address.zip
+    required: False
 ---
-id: requestor phone number
+id: requestor phone number and email
 question: |
-  What is your preferred phone number?
+  What is your preferred phone number and email?
 fields:
   - Phone Number: requestor.phone_number
+    required: False
+  - Email: requestor.email
+    required: False
 ---
 id: student name
 question: |
@@ -369,6 +379,15 @@ under: |
   or you can complete any portion of this form ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/)) and include your language. 
   A person will call you back with an interpreter if you need one. It may take up to 3 working days for someone to call you back.
 
+---
+id: call the hotline basic information
+event: call_the_hotline
+question: |
+  Please contact  MAC’s helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
+  It may take up to three business days for someone to get back to you.
+buttons:
+  - Leave: leave
+  - Restart: restart
 ---
 id: kick out requestor
 event: kick_out_requestor

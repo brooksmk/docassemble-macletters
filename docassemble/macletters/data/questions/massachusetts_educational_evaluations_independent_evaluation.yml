@@ -11,6 +11,7 @@ include:
 ---
 features:
   bootstrap theme: mac-bootstrap.css
+  progress bar: True
 ---
 metadata:
     title: | 
@@ -20,8 +21,7 @@ metadata:
     authors:
         - name: Matt Brooks
           organization: Lemma Legal
-
-    revision_date: 2020-02-10
+    revision_date: 2020-03-12
 ---
 objects: 
   - evaluators: | 
@@ -218,7 +218,7 @@ question: |
 under: |
   % if is_child_in_school == False and school.special_education_director.address == None:
   Because your child is not in school, you need to send it to the special education director for your district.
-  Please contact  MAC’s helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
+  Please contact  MAC's helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
   for help locating this address. It may take up to three business days for someone to get back to you.
 
   You may also be able to find the name of your district's special education director  by searching [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx).
@@ -262,7 +262,7 @@ buttons:
 id: call the hotline independent evaluation
 event: call_the_hotline
 question: |
-  Please contact  MAC’s helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
+  Please contact  MAC's helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
   It may take up to three business days for someone to get back to you.
 buttons:
   - Leave: leave
