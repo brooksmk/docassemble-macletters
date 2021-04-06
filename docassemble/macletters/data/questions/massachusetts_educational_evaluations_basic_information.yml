@@ -5,7 +5,6 @@ modules:
     - docassemble.income.income
     - dateutil
     - .educational_evaluations
-
 ---
 metadata:
     description: |
@@ -23,6 +22,8 @@ objects:
 features:
   bootstrap theme: mac-bootstrap.css
   progress bar: True
+  question back button: True
+  question help button: True
 ---
 mandatory: True
 objects:
@@ -44,7 +45,6 @@ default screen parts:
     % if get_config('debug'):
     `Page id: ${ user_info().question_id }`
     % endif
-
 ---
 code: |
   student.age = student.age_in_years()
@@ -58,17 +58,20 @@ code: |
   allow_cron = True
   multi_user = True
   # welcome_screen_seen
+  student.name.first
   if not is_child_in_school:
     call_the_hotline
   before_you_start_screen_seen
   requestor.language
   if requestor.language == 'Other':
-    kick_out_language
+    kick_out_language    
   requestor.right_to_send
   if requestor.right_to_send == 'Other':
     kick_out_requestor
-  else:
-    pass
+  #else:
+  #  pass
+  if requestor.right_to_send == 'Student':
+    requestor.name = student.name
   requestor.name.first
   requestor.address.address
   requestor.phone_number
@@ -131,66 +134,77 @@ terms:
 ---
 id: is child in school screen
 question: |
-  Is the child this request is for in school?
+  Is ${ student.familiar() } enrolled in school?
 yesno: is_child_in_school
 ---
-if: |
-  is_child_in_school == False
 id: before you start screen child not in school
 field: before_you_start_screen_seen
 question: |
-  Before you start, you will need the name and address of the special education director for your child's school. You should be able to find it [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx)
- 
-  You will also need the child’s full name and date of birth.  
-under: |
+  Getting started
+subquestion: |
+  Before you start, you will need:
   
- 
-  This is not legal advice or medical advice. Contact a lawyer if you need legal advice. Contact your child’s pediatrician if you have questions about what evaluations your child 
-  may need after completing this questionnaire. This is not intended to diagnose any condition, but rather to suggest areas in which your child may need support to 
-  learn based on your observations and concerns of your child.
+  1. The name and address of the special education coordinator or director for 
+     your child's school.
+  2. Your child's full name and date of birth.
+  
+  You can find the name of your school's special education director 
+  [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx).
+  
+  The name of the special education coordinator is listed on your child's
+  IEP.
+
+  This form is not legal or medical advice.
+help:
+  label: |
+    How can I get medical or legal advice?
+  content: |
+    Contact a lawyer if you need legal advice. Contact your child’s pediatrician if you have questions about what evaluations your child 
+    may need after completing this questionnaire. This is not intended to diagnose any condition, but rather to suggest areas in which your child may need support to 
+    learn based on your observations and concerns of your child.
 
 ---
-if: |
-  is_child_in_school == True
-id: before you start screen child in school
-field: before_you_start_screen_seen
-question: |
-  Before you start, you will need the name and address of the child's school. You will also need the child’s full name and date of birth. 
-  It is helpful if you have the name of the {special education coordinator} at your child’s school or the name of the special education director.  
- 
-under: |
-
-  This is not legal advice or medical advice. Contact a lawyer if you need legal advice. Contact your child’s pediatrician if you have questions about what evaluations your child 
-  may need after completing this questionnaire. This is not intended to diagnose any condition, but rather to suggest areas in which your child may need support to 
-  learn based on your observations and concerns of your child.
-terms:
-  special education coordinator: |
-    The name of the special education coordinator should be listed on your child’s IEP.  If you do not know the name of the special education coordinator, 
-    you can try looking at the school webpage or doing an internet search using your child’s school district.
-
+# if: |
+#   is_child_in_school == True
+# id: before you start screen child in school
+# field: before_you_start_screen_seen
+# question: |
+#   Before you start, you will need the name and address of the child's school. You will also need the child’s full name and date of birth. 
+#   It is helpful if you have the name of the {special education coordinator} at your child’s school or the name of the special education director.  
+#  
+# under: |
+# 
+#   This is not legal advice or medical advice. Contact a lawyer if you need legal advice. Contact your child’s pediatrician if you have questions about what evaluations your child 
+#   may need after completing this questionnaire. This is not intended to diagnose any condition, but rather to suggest areas in which your child may need support to 
+#   learn based on your observations and concerns of your child.
+# terms:
+#   special education coordinator: |
+#     The name of the special education coordinator should be listed on your child’s IEP.  If you do not know the name of the special education coordinator, 
+#     you can try looking at the school webpage or doing an internet search using your child’s school district.
+# 
 ---
 id: primary language
 question: |
-  What is your primary language?
+  What language do you speak best?
 fields:
     - Language: requestor.language
       input type: radio
       choices:
-        - English
-        - Spanish
-        - Other
+        - English: English
+        - Spanish: Spanish
+        - Other: Other
 --- 
 id: requestor right to send
 question: |
-  Who will this letter be from?
+  How are **you** related to ${ student.familiar() }?
 fields:
     - Relationship: requestor.right_to_send
       input type: radio
       choices:
-        - Parent
-        - Legal Guardian
-        - Student
-        - Other
+        - Parent: Parent
+        - Legal Guardian: Legal Guardian
+        - I am ${ student.familiar() }: Student
+        - Other: Other
 ---
 id: requestor name
 question: |
@@ -212,7 +226,7 @@ fields:
     code: |
       states_list()
     default: MA
-  - Zip Code: requestor.address.zip
+  - Zip: requestor.address.zip
     required: False
 ---
 id: requestor phone number and email
@@ -226,21 +240,26 @@ fields:
 ---
 id: student name
 question: |
-  % if requestor.right_to_send == 'Student':
-  What is your name?
-  % else:
-  What is the name of the student who this request is for?
-  % endif
+  Who is this letter for?
+subquestion: |
+  Write the name of the student who needs or currently
+  receives special education services.
 fields:
-  - First Name: student.name.first
-  - Last Name: student.name.last
+  - First: student.name.first
+  - Middle: student.name.middle
+    required: False
+  - Last: student.name.last
+  - Suffix: student.name.suffix
+    required: False
+    code: |
+      name_suffix()
 ---
 id: student information
 question: |
   % if requestor.right_to_send == 'Student':
-  Tell me about yourself.
+  Information about you
   % else:
-  Tell me about ${student.name.first}.
+  Information about ${student.name.first}
   % endif
 fields:
     - ${student.name.first}'s Birthdate: student.birthdate
@@ -301,7 +320,10 @@ fields:
     - City: school.address.city
     - State: school.address.state
       default: MA
-    - Zip Code: school.address.zip
+      code: |
+        states_list()
+    - Zip: school.address.zip
+      required: False
 ---
 id: special education director address in school
 question: |
@@ -317,17 +339,20 @@ fields:
     - State: school.special_education_director.address.state
       show if: school.special_education_director.requestor_knows_address
       default: MA
-    - Zip Code: school.special_education_director.address.zip
+      code: |
+        states_list()
+    - Zip: school.special_education_director.address.zip
       show if: school.special_education_director.requestor_knows_address
+      required: False
 under: |
   Because ${student.name.first} is not yet in school, you need to send this letter to the special education director
   for where you live. You can find out who your special education director is by searching [here](https://eecweb.eec.state.ma.us/ChildCareSearch/Special.aspx).
 ---
 id: special education coordinator information
 question: |
-  Please fill in the following information.
+  Special Education Coordinator
 fields:
-  - "Do you know the name of the {special education coordinator} for ${ student.name.first }?": school.special_education_coordinator.requestor_knows_name
+  - "Do you know the name of the {special education coordinator} for ${ student.familiar() }?": school.special_education_coordinator.requestor_knows_name
     datatype: yesnoradio
   - Recipient Title: school.recipient.title
     input type: radio
@@ -396,7 +421,12 @@ under: |
 id: call the hotline basic information
 event: call_the_hotline
 question: |
-  Please contact  MAC’s helpline at 617-357-8431 or online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
+  You may need more help than this form can give you
+subquestion: |
+  You can call Massachusetts Advocates for Children for one-on-one help.
+  
+  Call 617-357-8431 or ask for help online here ([Massachusetts Advocates for Children Helpline](https://massadvocates.org/helpline/))
+  
   It may take up to three business days for someone to get back to you.
 buttons:
   - Leave: leave

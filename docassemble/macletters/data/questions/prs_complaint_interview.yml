@@ -3,7 +3,7 @@ modules:
     - docassemble.base.util
     - docassemble.base.legal
     - docassemble.income.income
-    - docassemble.prs.prs
+    - .prs
 ---
 metadata:
     title: | 
@@ -16,8 +16,8 @@ metadata:
     revision_date: 2020-07-15
 ---
 objects:
-  - translated_documents: PRSTranslatedDocuments()
-  - meetings: PRSMeetings()
+  - translated_documents: PRSTranslatedDocuments
+  - meetings: PRSMeetings
 ---
 id: mac prs language access complaint interview order block
 code: |
