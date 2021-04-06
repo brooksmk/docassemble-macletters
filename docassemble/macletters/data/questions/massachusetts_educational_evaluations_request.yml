@@ -404,7 +404,7 @@ question: |
   
   ${ pdf_concatenate(initial_request_variable) }     
   
-  % if selected_evaluations["Transition Assessment"] == True:     
+  % if selected_evaluations.elements.get('Transition Assessment'):     
   
   
    >This is a request for a Transition Assessment. You should send it at the same time as the evaluation request letter. 
