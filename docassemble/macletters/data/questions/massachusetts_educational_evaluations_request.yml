@@ -76,24 +76,26 @@ code: |
   else:
     custom_evaluations = list()
   initial_request_concatenated = pdf_concatenate(initial_request_variable)
+  if wants_reminders:
+    requestor.email
+    letter_created_date = today()
+  
   if done['emailed to the person receiving it']:
     school.recipient.email
     send_email(to=[school.recipient.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[pdf_concatenate(initial_request_variable), pdf_concatenate(educational_evaluations_copy_request_variable), pdf_concatenate(educational_evaluations_transition_assessment_variable)])
     if done['emailed to me']:
       requestor.email
       send_email(to=[requestor.email], subject=str(student.name.full()) + " Evaluation Request", attachments=[initial_request_variable, educational_evaluations_copy_request_variable, educational_evaluations_transition_assessment_variable])
-  if wants_reminders:
-    requestor.email
-    letter_created_date = today()
   end_screen
 ---
 if: |
   student.age < 14
 id: confirm evaluations screen over 14
 question : |
-  Please select the evaluations you want.
+  What evaluations does ${ student.familiar() } need?
+subquestion: |
 fields:
-  - "Select your evaluations here.": selected_evaluations
+  - no label: selected_evaluations
     datatype: checkboxes
     choices:
       - Educational Assessment
@@ -115,16 +117,24 @@ fields:
       is: True
 help:
   label: |
-    Need help? Not sure what these are? Click here.
+    How do I choose?
   content: |
     Educational Assessment - Explanatory Text
+    
     Speech and Language Therapy Evaluation - Explanatory Text
+    
     Social Pragmatic Language - Explanatory Text
+    
     Occupational Therapy - Explanatory Text
+    
     Functional Behavior Assessment - Explanatory Text
+    
     Psychological Assessment - Explanatory Text
+    
     Physical Therapy - Explanatory Text
+    
     Augmentative and Alternative Communication Evaluation - Explanatory Text
+    
     Assistive Technology Evaluation - Explanatory Text
 ---
 if: |
@@ -190,12 +200,17 @@ fields:
 ---
 id: initial evaluation intro screen
 question: |
-  The following checklists are to help you decide what evaluations you think ${student.name.first} needs.
+  Choosing student evaluations
+subquestion: |
+  On the next page, you will have a chance to choose the evaluations
+  you want your school to perform.
+    
+  It is a good idea to talk to ${student.name.first}'s pediatrician or 
+  specialists about other evaluations ${student.pronoun_subjective()} might need if you 
+  are unsure.
   
-under: |  
-  When you see your letter at the end, you can add or remove evaluations from the letter.  
-  
-  It is a good idea to talk to ${student.name.first}'s pediatrician or specialists about other evaluations ${student.pronoun()} might need if you are unsure.
+  You may not see the evaluation you want listed. You will have a chance to
+  edit the final letter to add additional evaluations.
 field: educational_evaluations_intro_screen
 ---
 id: speech and language therapy
@@ -470,12 +485,14 @@ fields:
 ---
 id: wants reminders screen
 question: |
-  The School District is required to provide you with a consent form within five school   days of receiving this form.
-yesno: wants_reminders
-under: |
-  Would you like a reminder to follow up with the school?
----
+  Getting a reminder
+subquestion: |  
+  The School District is required to provide you with a consent form within 
+  five school days of receiving this form.
 
+  Would you like a reminder to follow up with the school?
+yesno: wants_reminders
+---
 id: end screen initial request
 event: end_screen
 question: |
